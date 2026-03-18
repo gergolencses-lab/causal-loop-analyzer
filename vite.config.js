@@ -8,5 +8,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   root: __dirname,
+  base: '/causal-loop-analyzer/',
   plugins: [react(), tailwindcss()],
 })
