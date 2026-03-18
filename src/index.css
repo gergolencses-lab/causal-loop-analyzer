@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background: #f5f4f0;
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseRing {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.15); opacity: 0.1; }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fade-up { animation: fadeUp 0.4s ease-out both; }
+.fade-up-d1 { animation-delay: 0.08s; }
+.fade-up-d2 { animation-delay: 0.16s; }
+.fade-up-d3 { animation-delay: 0.24s; }
+.pulse-ring { animation: pulseRing 2s ease-in-out infinite; }
+.spin-slow { animation: spinSlow 8s linear infinite; }
+.drop-zone-active {
+  border-color: #4A90E2 !important;
+  background: #eef6ff !important;
+  transform: scale(1.005);
+}
