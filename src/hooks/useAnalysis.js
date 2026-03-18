@@ -52,7 +52,7 @@ export default function useAnalysis() {
           'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-opus-4-6-20250514',
           max_tokens: 8192,
           messages: [{
             role: 'user',
