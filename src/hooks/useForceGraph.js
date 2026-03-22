@@ -16,7 +16,7 @@ export default function useForceGraph(nodes, connections, width = 800, height = 
     setSettled(false);
 
     // Create simulation nodes with initial circular layout as starting positions
-    const cx = width / 2, cy = height / 2, r = Math.min(width, height) * 0.28;
+    const cx = width / 2, cy = height / 2, r = Math.min(width, height) * 0.38;
     const simNodes = nodes.map((node, i) => {
       const angle = (i / nodes.length) * 2 * Math.PI - Math.PI / 2;
       return {
@@ -32,10 +32,10 @@ export default function useForceGraph(nodes, connections, width = 800, height = 
       .map(c => ({ source: c.from, target: c.to }));
 
     const sim = forceSimulation(simNodes)
-      .force('link', forceLink(simLinks).id(d => d.id).distance(180).strength(0.6))
-      .force('charge', forceManyBody().strength(-500))
+      .force('link', forceLink(simLinks).id(d => d.id).distance(220).strength(0.5))
+      .force('charge', forceManyBody().strength(-800))
       .force('center', forceCenter(cx, cy))
-      .force('collide', forceCollide().radius(d => d.radius + 20).strength(0.8))
+      .force('collide', forceCollide().radius(d => d.radius + 30).strength(0.8))
       .alphaDecay(0.03)
       .on('tick', () => {
         const pos = {};

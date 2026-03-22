@@ -44,10 +44,10 @@ export default function CausalGraph({ data, onSelectNode, onSelectConnection }) 
   const hasPositions = Object.keys(positions).length > 0;
 
   return (
-    <div className="max-w-3xl mx-auto fade-up">
+    <div className="max-w-4xl mx-auto fade-up">
       <GraphLegend />
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)', aspectRatio: '1/1' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)' }}>
         <svg
           ref={svgRef}
           width="100%"
