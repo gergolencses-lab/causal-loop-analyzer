@@ -2,7 +2,8 @@ import { useState, useRef } from 'react';
 import { readFile } from '../utils/fileHelpers';
 import { COMBINED_PROMPT, LANG_NAMES, PROGRESS_STEPS } from '../constants/prompt';
 
-const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
+// Anthropic API key now lives server-side in the Cloudflare Worker proxy (proxy/worker.js).
+const PROXY_URL = 'https://causal-loop-proxy.gergo-lencses.workers.dev';
 
 export default function useAnalysis() {
   const [progress, setProgress] = useState('');
@@ -43,13 +44,10 @@ export default function useAnalysis() {
         text: 'Analyze the above content. Generate the causal loop map AND the intervention strategy together in a single JSON response. Output ONLY valid JSON, nothing else.' + langInstruction
       });
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch(PROXY_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model: 'claude-opus-4-8',
