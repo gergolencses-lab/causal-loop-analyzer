@@ -57,6 +57,7 @@ export default function App() {
         body: JSON.stringify({
           model: 'claude-opus-4-8',
           max_tokens: 8192,
+          stream: true,
           messages: [{
             role: 'user',
             content: [{ type: 'text', text: COMBINED_PROMPT }, ...contentBlocks]
@@ -69,12 +70,44 @@ export default function App() {
         throw new Error(`API error ${response.status}: ${errBody.slice(0, 200)}`)
       }
 
-      const result = await response.json()
-      if (result.stop_reason === 'max_tokens') {
-        throw new Error('Response was truncated. Try with fewer or shorter files.')
+      // Streamed (SSE) response — accumulate text deltas as they arrive so the
+      // request starts returning immediately and never trips Cloudflare's ~100s
+      // edge timeout (HTTP 524) on long generations.
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      let rawText = ''
+      let stopReason = null
+      let apiError = null
+      for (;;) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop()
+        for (const line of lines) {
+          const s = line.trim()
+          if (!s.startsWith('data:')) continue
+          const payload = s.slice(5).trim()
+          if (!payload) continue
+          let evt
+          try { evt = JSON.parse(payload) } catch { continue }
+          if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+            rawText += evt.delta.text
+          } else if (evt.type === 'message_delta' && evt.delta?.stop_reason) {
+            stopReason = evt.delta.stop_reason
+          } else if (evt.type === 'error') {
+            apiError = evt.error
+          }
+        }
       }
 
-      const rawText = result.content?.find(c => c.type === 'text')?.text || ''
+      if (apiError) {
+        throw new Error(`API error: ${apiError.message || 'stream error'}`)
+      }
+      if (stopReason === 'max_tokens') {
+        throw new Error('Response was truncated. Try with fewer or shorter files.')
+      }
       const cleanJson = rawText
         .replace(/```json\s*|```\s*/g, '')
         .replace(/[\x00-\x1F\x7F]/g, (ch) => ch === '\n' || ch === '\r' || ch === '\t' ? ch : '')
